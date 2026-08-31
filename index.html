@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="師培小站">
+<title>師培小站</title>
+<style>
+:root{
+  --bg:#fffaf7;--card:#fff;--text:#334155;--muted:#7b8494;
+  --green:#72aa95;--green2:#e7f3ee;--pink:#f5d1d8;--yellow:#f8e2a5;
+  --blue:#cfe5f1;--line:#eee5df;--danger:#d9828e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.layout{display:flex;min-height:100vh}
+.side{width:235px;background:#fff;border-right:1px solid var(--line);padding:24px 17px;position:fixed;height:100vh;z-index:10}
+.logo{font-size:21px;font-weight:900;margin:4px 10px 27px}
+.logo span{font-size:29px}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:12px 14px;border-radius:13px;color:#687385;margin:3px 0}
+.nav button.active,.nav button:hover{background:var(--green2);color:#477e6a;font-weight:700}
+.side-user{position:absolute;bottom:20px;left:17px;right:17px;background:#faf7f4;border-radius:16px;padding:12px;font-size:13px}
+.main{margin-left:235px;width:calc(100% - 235px);padding:30px 45px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:15px}
+.top h1{font-size:27px;margin:0 0 5px}
+.top p{margin:0;color:var(--muted)}
+.top-right{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px}
+.btn{border:0;background:var(--green);color:#fff;border-radius:11px;padding:10px 16px;font-weight:700}
+.btn.secondary{background:#f3ece7;color:#665b55}
+.btn.danger{background:var(--danger);color:#fff}
+.hero{background:linear-gradient(120deg,#e9f5ef,#f8eee7);padding:22px;border-radius:20px;margin-bottom:20px}
+.search{display:flex;gap:9px}
+.search input{flex:1;border:1px solid #e2d9d3;border-radius:12px;padding:12px 14px;background:#fff}
+.grid{display:grid;grid-template-columns:1.45fr 1fr;gap:20px}
+.card{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;box-shadow:0 5px 18px #80634b0b}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;gap:10px}
+.head h2{margin:0;font-size:18px}
+.notice,.event,.row{padding:13px 0;border-bottom:1px solid var(--line)}
+.notice:last-child,.event:last-child,.row:last-child{border:0}
+.notice{display:flex;gap:12px}
+.tag{font-size:11px;font-weight:800;border-radius:8px;padding:5px 8px;height:max-content;white-space:nowrap}
+.green{background:#e3f2eb;color:#4b8b72}.yellow{background:#fff0c6;color:#97721b}.blue{background:#e5f1f8;color:#527f98}
+.muted{color:var(--muted);font-size:12px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.action{border:1px solid var(--line);background:#fffaf7;border-radius:14px;padding:15px;text-align:left}
+.action b{display:block;margin:5px 0}
+.ai{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:19px;padding:18px;display:flex;gap:14px;align-items:center}
+.ai-icon{font-size:30px;background:#eef6f2;border-radius:13px;padding:8px}
+.ai button{margin-left:auto}
+.view{display:none}.view.active{display:block}
+.form-grid{display:grid;gap:13px;max-width:720px}
+.form-grid label{font-weight:700;font-size:14px}
+.form-grid input,.form-grid select,.form-grid textarea{width:100%;margin-top:6px;padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.toolbar{display:flex;gap:9px;margin-bottom:15px;flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.modal{position:fixed;inset:0;background:#0005;display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:19px;padding:22px;max-width:560px;width:100%;max-height:85vh;overflow:auto}
+.close{float:right;border:0;background:#f3ece7;border-radius:8px;padding:5px 9px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.admin-lock-note{margin:0 0 14px;padding:11px 13px;background:#fff7e6;border:1px solid #f1dfb0;border-radius:11px;color:#80651f;font-size:13px}
+.admin-only{display:none!important}
+.admin-unlocked .admin-only{display:inline-block!important}
+.admin-status{font-size:12px;color:var(--muted);margin-left:8px}
+.detail-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.detail-item{background:#faf7f4;border-radius:12px;padding:12px}
+.detail-item b{display:block;margin-bottom:4px}
+.event-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+@media(max-width:850px){
+  .side{display:none}.main{margin:0;width:100%;padding:22px}
+  .grid{grid-template-columns:1fr}.top{align-items:flex-start}
+  .top-right .pill{display:none}.actions{grid-template-columns:1fr}
+  .detail-meta{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="logo">🌱 師培小站</div>
+  <nav class="nav">
+    <button data-view="home" class="active">🏠　首頁</button>
+    <button data-view="announcements">📢　最新公告</button>
+    <button data-view="events">📅　活動</button>
+    <button data-view="search">🔎　資訊搜尋</button>
+    <button data-view="admin" id="adminNav" class="admin-only">⚙️　管理後台</button>
+  </nav>
+  <div class="side-user">👩🏻‍🎓　<b>網站訪客</b><br><span class="muted" id="sideRole">一般瀏覽者</span></div>
+</aside>
+
+<main class="main">
+<div class="top">
+  <div><h1 id="title">早安，歡迎來到師培小站！🌷</h1><p id="subtitle">師培資訊、活動與服務，一站掌握。</p></div>
+  <div class="top-right">
+    <span class="pill">🔔 <span id="notify">0</span></span>
+    <button class="btn" id="adminLoginBtn" onclick="openAdminLogin()">🔐 管理員登入</button>
+    <button class="btn secondary admin-only" onclick="adminLogout()">登出管理員</button>
+  </div>
+</div>
+
+<section id="home" class="view active">
+  <div class="hero">
+    <h2>今天想找什麼？</h2>
+    <div class="search">
+      <input id="homeSearch" placeholder="搜尋公告、活動……" onkeydown="if(event.key==='Enter')doSearch(this.value)">
+      <button class="btn" onclick="doSearch(document.getElementById('homeSearch').value)">搜尋</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="head"><h2>📢 最新公告</h2><button class="btn secondary" onclick="show('announcements')">全部</button></div>
+      <div id="homeNotices"></div>
+    </div>
+    <div class="card">
+      <div class="head"><h2>🌼 快速功能</h2></div>
+      <div class="actions">
+        <button class="action" onclick="show('events')">📅<b>查看活動</b><small class="muted">查看活動詳細資訊</small></button>
+        <button class="action" onclick="show('announcements')">📢<b>查看公告</b><small class="muted">掌握最新師培資訊</small></button>
+        <button class="action" onclick="show('search')">🔎<b>資訊搜尋</b><small class="muted">搜尋公告與活動</small></button>
+      </div>
+    </div>
+    <div class="card"><div class="head"><h2>📅 活動</h2></div><div id="homeEvents"></div></div>
+  </div>
+</section>
+
+<section id="announcements" class="view">
+  <div class="card">
+    <div class="head"><h2>📢 最新公告</h2><button class="btn admin-only" onclick="openNotice()">＋ 發布公告</button></div>
+    <p class="admin-lock-note">🔒 一般瀏覽者只能閱讀；發布與刪除公告需要管理員登入。</p>
+    <div class="toolbar"><input id="noticeFilter" placeholder="搜尋公告…" oninput="renderAnnouncements()"><select id="noticeCat" onchange="renderAnnouncements()"><option value="">全部分類</option><option>重要</option><option>活動</option><option>提醒</option><option>一般</option></select></div>
+    <div id="noticeList"></div>
+  </div>
+</section>
+
+<section id="events" class="view">
+  <div class="card">
+    <div class="head"><h2>📅 活動</h2><button class="btn admin-only" onclick="openEvent()">＋ 新增活動</button></div>
+    <p class="admin-lock-note">🔒 一般瀏覽者可以查看活動與詳細內容；新增、刪除活動需要管理員登入。</p>
+    <div id="eventList"></div>
+  </div>
+</section>
+
+<section id="search" class="view">
+  <div class="card"><h2>🔎 全站搜尋</h2>
+    <div class="search" style="margin:15px 0"><input id="globalSearch" placeholder="輸入關鍵字" onkeydown="if(event.key==='Enter')doSearch(this.value)"><button class="btn" onclick="doSearch(document.getElementById('globalSearch').value)">搜尋</button></div>
+    <div id="searchResults" class="empty">輸入關鍵字後搜尋公告與活動。</div>
+  </div>
+</section>
+
+<section id="admin" class="view">
+  <div class="grid">
+    <div class="card">
+      <h2>⚙️ 管理後台 <span id="adminStatus" class="admin-status">🔒 尚未登入</span></h2>
+      <p class="admin-lock-note">🔐 只有管理員登入後才會顯示此頁面與管理功能。</p>
+      <div class="row"><b id="statNotice">0</b><div class="muted">公告</div></div>
+      <div class="row"><b id="statEvent">0</b><div class="muted">活動</div></div>
+      <div class="row"><b id="statResponse">0</b><div class="muted">活動報名資料</div></div>
+    </div>
+    <div class="card">
+      <h2>💡 管理說明</h2>
+      <p>管理員可以發布／刪除公告、新增／刪除活動，並查看活動報名資料。</p>
+      <p class="muted">此版本為純 HTML + CSS + JavaScript，資料保存在使用者目前瀏覽器的 localStorage。</p>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box"><button class="close" onclick="closeModal()">✕</button><div id="modalContent"></div></div>
+</div>
+
+<script>
+"use strict";
+
+/* ===== Initial data ===== */
+const SEED = {
+  notices:[
+    {id:1,title:"2026 師培獎學金申請資訊",cat:"重要",date:"2026/08/28",body:"請依師培中心公告確認申請資格、文件與期限。"},
+    {id:2,title:"教育實習說明會開始報名",cat:"活動",date:"2026/08/26",body:"歡迎有教育實習規劃的同學參加。"},
+    {id:3,title:"中學實地服務學習時數登錄方式更新",cat:"提醒",date:"2026/08/24",body:"請依最新流程完成時數登錄。"},
+    {id:4,title:"本學期師培課程加退選注意事項",cat:"一般",date:"2026/08/21",body:"請留意各課程加退選期限。"}
+  ],
+  events:[
+    {
+      id:1,
+      title:"教師資格考試經驗分享（歷史活動範例）",
+      date:"2026-08-15",
+      time:"18:30",
+      location:"師培中心",
+      cap:50,
+      joined:50,
+      description:"分享教師資格考試準備經驗、讀書規劃與應試心得，提供師資生作為準備參考。",
+      organizer:"師培中心學生會",
+      note:"本活動為歷史活動範例，僅供瀏覽與展示。"
+    }
+  ],
+  responses:[]
+};
+
+const ADMIN_USER="ouo";
+const ADMIN_PASS="ouo";
+
+function clone(v){return JSON.parse(JSON.stringify(v));}
+function load(key){
+  try{
+    const raw=localStorage.getItem("tp_"+key);
+    if(raw!==null)return JSON.parse(raw);
+  }catch(e){}
+  return clone(SEED[key]);
+}
+function save(key,value){
+  try{
+    localStorage.setItem("tp_"+key,JSON.stringify(value));
+  }catch(e){
+    alert("瀏覽器無法儲存資料，請確認瀏覽器允許此網站使用儲存空間。");
+  }
+}
+
+let notices=load("notices");
+let events=load("events");
+let responses=load("responses");
+let adminUnlocked=sessionStorage.getItem("tp_admin_auth")==="1";
+const el=id=>document.getElementById(id);
+
+/* ===== Navigation ===== */
+const titles={
+  home:"早安，歡迎來到師培小站！🌷",
+  announcements:"最新公告 📢",
+  events:"活動 📅",
+  search:"全站搜尋 🔎",
+  admin:"管理後台 ⚙️"
+};
+
+function show(id){
+  if(id==="admin" && !isAdmin()){
+    openAdminLogin();
+    return;
+  }
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  const target=el(id);
+  if(!target)return;
+  target.classList.add("active");
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===id));
+  el("title").textContent=titles[id]||"師培小站";
+  renderAll();
+}
+
+document.querySelectorAll(".nav button").forEach(b=>{
+  b.addEventListener("click",()=>show(b.dataset.view));
+});
+
+/* ===== Admin authentication ===== */
+function isAdmin(){return adminUnlocked===true;}
+
+function openAdminLogin(){
+  modal(`
+    <h2>🔐 管理員登入</h2>
+    <p class="muted">一般瀏覽者不需要登入即可查看網站。只有管理員登入後，才會出現管理後台與編輯功能。</p>
+    <div class="form-grid">
+      <label>管理員帳號<input id="adminUser" autocomplete="username"></label>
+      <label>管理員密碼<input id="adminPass" type="password" autocomplete="current-password"></label>
+      <button class="btn" onclick="adminLogin()">登入管理後台</button>
+      <div id="adminError" style="color:#b4535b;font-size:13px"></div>
+    </div>
+  `);
+  setTimeout(()=>el("adminUser")?.focus(),50);
+}
+
+function adminLogin(){
+  const u=(el("adminUser")?.value||"").trim();
+  const p=el("adminPass")?.value||"";
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    adminUnlocked=true;
+    sessionStorage.setItem("tp_admin_auth","1");
+    closeModal();
+    updateAdminUI();
+    show("admin");
+  }else{
+    const e=el("adminError");
+    if(e)e.textContent="管理員帳號或密碼錯誤，請重新輸入。";
+  }
+}
+
+function requireAdmin(){
+  if(isAdmin())return true;
+  openAdminLogin();
+  return false;
+}
+
+function adminLogout(){
+  adminUnlocked=false;
+  sessionStorage.removeItem("tp_admin_auth");
+  updateAdminUI();
+  show("home");
+}
+
+function updateAdminUI(){
+  document.body.classList.toggle("admin-unlocked",isAdmin());
+  const nav=el("adminNav");
+  if(nav)nav.style.display=isAdmin()?"block":"none";
+  const loginBtn=el("adminLoginBtn");
+  if(loginBtn)loginBtn.style.display=isAdmin()?"none":"inline-block";
+  const status=el("adminStatus");
+  if(status)status.textContent=isAdmin()?"🟢 管理員已登入":"🔒 尚未登入";
+  el("sideRole").textContent=isAdmin()?"管理員（已登入）":"一般瀏覽者";
+}
+
+/* ===== Announcements ===== */
+function renderAnnouncements(){
+  const q=(el("noticeFilter")?.value||"").toLowerCase();
+  const c=el("noticeCat")?.value||"";
+  const a=notices.filter(n=>
+    (!q||(n.title+n.body).toLowerCase().includes(q))&&(!c||n.cat===c)
+  );
+  el("noticeList").innerHTML=a.map(n=>`
+    <div class="notice">
+      <span class="tag ${n.cat==="重要"?"yellow":n.cat==="活動"?"green":n.cat==="提醒"?"blue":"green"}">${escapeHtml(n.cat)}</span>
+      <div style="flex:1">
+        <b>${escapeHtml(n.title)}</b><div class="muted">${escapeHtml(n.date)}</div>
+        <p style="margin:7px 0">${escapeHtml(n.body)}</p>
+      </div>
+      <button class="btn secondary" onclick="readNotice(${n.id})">查看</button>
+      ${isAdmin()?`<button class="btn danger" onclick="deleteNotice(${n.id})">刪除</button>`:""}
+    </div>
+  `).join("")||'<div class="empty">沒有符合的公告。</div>';
+}
+
+function openNotice(){
+  if(!requireAdmin())return;
+  modal(`
+    <h2>📢 發布公告</h2>
+    <div class="form-grid">
+      <label>標題<input id="ntitle"></label>
+      <label>分類<select id="ncat"><option>重要</option><option>活動</option><option>提醒</option><option>一般</option></select></label>
+      <label>內容<textarea id="nbody" rows="5"></textarea></label>
+      <button class="btn" onclick="addNotice()">發布</button>
+    </div>
+  `);
+}
+function addNotice(){
+  if(!requireAdmin())return;
+  const title=el("ntitle").value.trim(),body=el("nbody").value.trim();
+  if(!title||!body){alert("請填寫標題與內容。");return;}
+  notices.unshift({
+    id:Date.now(),title,cat:el("ncat").value,
+    date:new Date().toLocaleDateString("zh-TW"),body
+  });
+  save("notices",notices);closeModal();renderAll();
+}
+function readNotice(id){
+  const n=notices.find(x=>x.id===id);if(!n)return;
+  modal(`<h2>${escapeHtml(n.title)}</h2><div class="muted">${escapeHtml(n.date)}｜${escapeHtml(n.cat)}</div><p style="line-height:1.8">${escapeHtml(n.body)}</p>`);
+}
+function deleteNotice(id){
+  if(!requireAdmin())return;
+  const n=notices.find(x=>x.id===id);if(!n)return;
+  if(!confirm(`確定刪除「${n.title}」嗎？`))return;
+  notices=notices.filter(x=>x.id!==id);
+  save("notices",notices);renderAll();
+}
+
+/* ===== Events ===== */
+function renderEvents(){
+  el("eventList").innerHTML=events.map(e=>`
+    <div class="event">
+      <b>${escapeHtml(e.title)}</b>
+      <div class="muted">${escapeHtml(e.date)} ${escapeHtml(e.time)}｜${escapeHtml(e.location)}</div>
+      <div class="event-actions">
+        <button class="btn secondary" onclick="viewEvent(${e.id})">查看詳細內容</button>
+        ${isAdmin()?`<button class="btn danger" onclick="deleteEvent(${e.id}, event)">🗑️ 刪除活動</button>`:""}
+      </div>
+    </div>
+  `).join("")||'<div class="empty">目前沒有活動。</div>';
+}
+
+function viewEvent(id){
+  const e=events.find(x=>x.id===id);if(!e)return;
+  modal(`
+    <h2>📅 ${escapeHtml(e.title)}</h2>
+    <div class="detail-meta">
+      <div class="detail-item"><b>日期</b>${escapeHtml(e.date||"未設定")}</div>
+      <div class="detail-item"><b>時間</b>${escapeHtml(e.time||"未設定")}</div>
+      <div class="detail-item"><b>地點</b>${escapeHtml(e.location||"未設定")}</div>
+      <div class="detail-item"><b>名額</b>${escapeHtml(String(e.cap||0))}</div>
+      <div class="detail-item"><b>主辦單位</b>${escapeHtml(e.organizer||"未提供")}</div>
+      <div class="detail-item"><b>報名網址</b>${e.registrationUrl?`<a href="${safeUrl(e.registrationUrl)}" target="_blank" rel="noopener noreferrer" class="btn" style="display:inline-block;text-decoration:none">🔗 前往報名</a>`:"未提供"}</div>
+    </div>
+    <h3>活動內容</h3>
+    <p style="line-height:1.9">${escapeHtml(e.description||"目前沒有提供詳細內容。")}</p>
+    ${e.note?`<p class="admin-lock-note">${escapeHtml(e.note)}</p>`:""}
+    <button class="btn secondary" onclick="closeModal()">關閉</button>
+  `);
+}
+
+function openEvent(){
+  if(!requireAdmin())return;
+  modal(`
+    <h2>📅 新增活動</h2>
+    <div class="form-grid">
+      <label>活動名稱<input id="etitle"></label>
+      <label>日期<input id="edate" type="date"></label>
+      <label>時間<input id="etime" type="time"></label>
+      <label>地點<input id="eloc"></label>
+      <label>主辦單位<input id="eorg"></label>
+      <label>報名網址<input id="ereg" type="url" placeholder="https://example.com/..." ></label>
+      <label>名額<input id="ecap" type="number" min="1" value="30"></label>
+      <label>活動詳細內容<textarea id="edesc" rows="6" placeholder="請輸入活動介紹、流程、注意事項等"></textarea></label>
+      <label>備註<textarea id="enote" rows="3"></textarea></label>
+      <button class="btn" onclick="addEvent()">建立活動</button>
+    </div>
+  `);
+}
+function addEvent(){
+  if(!requireAdmin())return;
+  const title=el("etitle").value.trim();
+  if(!title){alert("請填寫活動名稱。");return;}
+  const cap=Math.max(1,Number(el("ecap").value)||30);
+  events.push({
+    id:Date.now(),
+    title,
+    date:el("edate").value,
+    time:el("etime").value,
+    location:el("eloc").value.trim(),
+    organizer:el("eorg").value.trim(),
+    registrationUrl:el("ereg").value.trim(),
+    description:el("edesc").value.trim(),
+    note:el("enote").value.trim(),
+    cap,
+    joined:0
+  });
+  save("events",events);closeModal();renderAll();
+}
+function deleteEvent(id, event){
+  if(event) event.stopPropagation();
+  if(!isAdmin()){
+    openAdminLogin();
+    return false;
+  }
+
+  const numericId=Number(id);
+  const index=events.findIndex(x=>Number(x.id)===numericId);
+  if(index===-1){
+    alert("找不到要刪除的活動，請重新整理頁面後再試。");
+    return false;
+  }
+
+  const e=events[index];
+  if(!confirm(`確定要刪除「${e.title}」嗎？此操作無法復原。`))return false;
+
+  events.splice(index,1);
+  responses=responses.filter(r=>Number(r.eventId)!==numericId);
+
+  save("events",events);
+  save("responses",responses);
+  renderAll();
+
+  // 如果目前在管理後台，立即刷新統計。
+  if(el("admin")?.classList.contains("active")) renderAdmin();
+
+  return true;
+}
+/* ===== Search ===== */
+function doSearch(q){
+  q=(q||"").trim().toLowerCase();
+  show("search");
+  if(!q){el("searchResults").textContent="請輸入關鍵字。";return;}
+  const a=notices.filter(n=>(n.title+n.body).toLowerCase().includes(q))
+    .map(n=>`<div class="row"><b>📢 ${escapeHtml(n.title)}</b><div class="muted">${escapeHtml(n.date)}</div><button class="btn secondary" style="margin-top:7px" onclick="readNotice(${n.id})">查看</button></div>`);
+  const b=events.filter(e=>(e.title+" "+e.location+" "+(e.description||"")).toLowerCase().includes(q))
+    .map(e=>`<div class="row"><b>📅 ${escapeHtml(e.title)}</b><div class="muted">${escapeHtml(e.date)}｜${escapeHtml(e.location)}</div><button class="btn secondary" style="margin-top:7px" onclick="viewEvent(${e.id})">查看詳細內容</button></div>`);
+  el("searchResults").innerHTML=(a.concat(b).join(""))||'<div class="empty">找不到相關資料。</div>';
+}
+
+/* ===== Rendering ===== */
+function renderHome(){
+  el("homeNotices").innerHTML=notices.slice(0,4).map(n=>`
+    <div class="notice"><span class="tag ${n.cat==="重要"?"yellow":"green"}">${escapeHtml(n.cat)}</span>
+    <div><b>${escapeHtml(n.title)}</b><div class="muted">${escapeHtml(n.date)}</div></div></div>
+  `).join("")||'<div class="empty">目前沒有公告。</div>';
+
+  el("homeEvents").innerHTML=events.slice(0,3).map(e=>`
+    <div class="event"><b>${escapeHtml(e.title)}</b>
+    <div class="muted">${escapeHtml(e.date)} ${escapeHtml(e.time)}｜${escapeHtml(e.location)}</div>
+    <button class="btn secondary" style="margin-top:8px" onclick="viewEvent(${e.id})">查看詳細內容</button></div>
+  `).join("")||'<div class="empty">目前沒有活動。</div>';
+}
+
+function renderAdmin(){
+  el("statNotice").textContent=notices.length;
+  el("statEvent").textContent=events.length;
+  el("statResponse").textContent=responses.length;
+}
+
+function renderAll(){
+  renderAnnouncements();
+  renderEvents();
+  renderHome();
+  renderAdmin();
+  el("notify").textContent=notices.length;
+  updateAdminUI();
+}
+
+function modal(content){
+  el("modalContent").innerHTML=content;
+  el("modal").classList.add("show");
+}
+function closeModal(){el("modal").classList.remove("show");}
+function safeUrl(value){
+  const raw=String(value||"").trim();
+  try{
+    const u=new URL(raw,window.location.href);
+    if(u.protocol==="http:"||u.protocol==="https:") return escapeHtml(u.href);
+  }catch(e){}
+  return "#";
+}
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+renderAll();
+</script>
+</body>
+</html>
